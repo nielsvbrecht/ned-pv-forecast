@@ -61,6 +61,11 @@ python src/main.py YOUR_API_KEY_HERE Utrecht
 
 This project interacts with the ned.nl API to retrieve photovoltaic generation forecasts. Ensure you have the necessary API access and credentials if required.
 
+## Future plans
+
+1. I plan to integrate the postal code PV forecast into this script once this API is made available by ned.nl
+2. Develop this into a Home Assistant module to integrate the PV postal code forecast into your Home Assistant environment
+
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.

@@ -91,7 +91,8 @@ This project can be used as a Home Assistant addon. Follow these steps to add an
     - **API Key**: Enter your ned.nl API key here.
     - **Province**: Enter the name of the province for which you want to fetch the forecast.
     - **Days to Forecast**: Enter the number of days for the forecast (1-7).
-3. These options are passed to the script as environment variables (`API_KEY`, `PROVINCE`, `DAYS_TO_FORECAST`). The script `src/main.py` has been modified to read these environment variables instead of command-line arguments.
+    - **Granularity**: Enter the desired data granularity. Allowed values are "10 minutes", "15 minutes", "Hour", or "Day". Defaults to "Hour".
+3. These options are passed to the script as environment variables (`API_KEY`, `PROVINCE`, `DAYS_TO_FORECAST`, `GRANULARITY`). The script `src/main.py` has been modified to read these environment variables instead of command-line arguments.
 4. Click **Save**.
 
 ### Start the Addon

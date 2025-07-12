@@ -66,6 +66,40 @@ This project interacts with the ned.nl API to retrieve photovoltaic generation f
 1. I plan to integrate the postal code PV forecast into this script once this API is made available by ned.nl
 2. Develop this into a Home Assistant module to integrate the PV postal code forecast into your Home Assistant environment
 
+## Home Assistant Addon
+
+This project can be used as a Home Assistant addon. Follow these steps to add and configure the addon in your Home Assistant instance.
+
+### Add the Repository
+
+1. In Home Assistant, navigate to **Settings** -> **Add-ons**.
+2. Click on the **Add-on Store** button in the bottom right corner.
+3. Click on the three vertical dots in the top right corner and select **Repositories**.
+4. Add the URL of this GitHub repository (`https://github.com/nielsvbrecht/ned-pv-forecast`) to the list and click **Add**.
+5. Close the repositories list.
+
+### Install the Addon
+
+1. The new repository should now appear in the Add-on Store.
+2. Find the "PV Forecast" addon and click on it.
+3. Click on the **Install** button.
+
+### Configure the Addon
+
+1. After installation, go to the **Configuration** tab of the addon.
+2. You will see options corresponding to the `config.json` file:
+    - **API Key**: Enter your ned.nl API key here.
+    - **Province**: Enter the name of the province for which you want to fetch the forecast.
+    - **Days to Forecast**: Enter the number of days for the forecast (1-7).
+3. These options are passed to the script as environment variables (`API_KEY`, `PROVINCE`, `DAYS_TO_FORECAST`). The script `src/main.py` has been modified to read these environment variables instead of command-line arguments.
+4. Click **Save**.
+
+### Start the Addon
+
+1. Go to the **Info** tab of the addon.
+2. Click on the **Start** button.
+3. You can check the addon logs in the **Log** tab to see the fetched forecast data.
+
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.

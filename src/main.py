@@ -4,6 +4,7 @@
 import sys
 from datetime import datetime, timedelta
 import requests
+import os
 
 # API_KEY is now passed as a command-line argument
 # Define the base URL for the NED.nl API utilizations endpoint
@@ -26,8 +27,16 @@ PROVINCE_POINT_MAPPING = {
     # Add more provinces if needed based on API docs
 }
 
+# Mapping of granularity time formats to API IDs
+GRANULARITY_MAPPING = {
+    "10 minutes": 3,
+    "15 minutes": 4,
+    "Hour": 5,
+    "Day": 6,
+}
+
 # Define a function to fetch the PV forecast
-def get_pv_forecast(province_name, api_key, start_date, end_date):
+def get_pv_forecast(province_name, api_key, start_date, end_date, granularity_id):
     """Fetch the photovoltaic generation forecast for a specific province within a date range."""
     # Get the point ID for the given province name from the mapping
     point_id = PROVINCE_POINT_MAPPING.get(province_name)
@@ -48,7 +57,7 @@ def get_pv_forecast(province_name, api_key, start_date, end_date):
         "point": point_id, # Geographic point (province ID)
         "type": 2, # Energy carrier type (2 for Solar based on API docs)
         "classification": 1, # Data classification (1 for Forecast based on API docs)
-        "granularity": 5, # Data granularity (5 for Hour based on API docs, adjust if needed)
+        "granularity": granularity_id, # Data granularity (5 for Hour based on API docs, adjust if needed)
         "granularitytimezone": 0, # Granularity timezone (0 for UTC)
         "activity": 1, # Activity type (1 for Providing - generation)
         "validfrom[after]": start_date.strftime('%Y-%m-%d'), # Start date (inclusive)
@@ -106,45 +115,40 @@ def process_forecast_data(data):
 # Define the main function to run the script
 def main():
     """Main function to parse arguments and fetch/process PV forecast."""
-    # Check if the correct number of command-line arguments is provided
-    # (at least 2 required)
-    if len(sys.argv) < 3:
-        if len(sys.argv) == 1:
-            print("Error: API key and province name are missing.")
-        elif len(sys.argv) == 2:
-            print("Error: Province name is missing.")
-        # Print usage instructions
-        print("Usage: python main.py <api_key> <province_name> [days_to_forecast]")
-        # Exit the script with an error code
+    # Read configuration from environment variables
+    api_key = os.environ.get("API_KEY")
+    province = os.environ.get("PROVINCE")
+    days_to_forecast_str = os.environ.get("DAYS_TO_FORECAST", "7") # Default to 7 days
+    granularity_str = os.environ.get("GRANULARITY", "Hour") # Default to "Hour"
+
+    if not api_key:
+        print("Error: API_KEY environment variable not set.")
+        sys.exit(1)
+    if not province:
+        print("Error: PROVINCE environment variable not set.")
         sys.exit(1)
 
-    # Get the API key from the first command-line argument
-    api_key = sys.argv[1]
-    # Get the province name from the second command-line argument
-    province = sys.argv[2]
-
-    # Determine the number of days to forecast
-    days_to_forecast = 7 # Default to 7 days
-    if len(sys.argv) > 3:
-        try:
-            # Attempt to convert the third argument to an integer
-            days_to_forecast = int(sys.argv[3])
-            # Validate that the number of days is between 1 and 7
-            if not 1 <= days_to_forecast <= 7:
-                print("Error: Number of days to forecast must be between 1 and 7.")
-                print("Usage: python main.py <api_key> <province_name> [days_to_forecast]")
-                sys.exit(1)
-        except ValueError:
-            print("Error: Invalid value for days to forecast. Please provide an integer.")
-            print("Usage: python main.py <api_key> <province_name> [days_to_forecast]")
+    try:
+        days_to_forecast = int(days_to_forecast_str)
+        if not 1 <= days_to_forecast <= 7:
+            print("Error: DAYS_TO_FORECAST must be an integer between 1 and 7.")
             sys.exit(1)
+    except ValueError:
+        print("Error: Invalid value for DAYS_TO_FORECAST. Please provide an integer.")
+        sys.exit(1)
+
+    # Get granularity ID from string
+    granularity_id = GRANULARITY_MAPPING.get(granularity_str)
+    if granularity_id is None:
+        print(f"Error: Invalid value for GRANULARITY: '{granularity_str}'. Allowed values are {list(GRANULARITY_MAPPING.keys())}.")
+        sys.exit(1)
 
     # Calculate the date range based on the determined number of days
     start_date = datetime.now()
     end_date = start_date + timedelta(days=days_to_forecast)
 
     # Call the get_pv_forecast function to fetch the data with the date range
-    forecast_data = get_pv_forecast(province, api_key, start_date, end_date)
+    forecast_data = get_pv_forecast(province, api_key, start_date, end_date, granularity_id)
     # Call the process_forecast_data function to process and print the data
     process_forecast_data(forecast_data)
 

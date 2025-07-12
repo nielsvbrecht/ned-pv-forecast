@@ -1,0 +1,22 @@
+{
+  "name": "PV Forecast",
+  "version": "0.1.0",
+  "slug": "pv_forecast",
+  "description": "Fetches PV generation forecast using the ned.nl API",
+  "arch": ["amd64", "aarch64"],
+  "startup": "once",
+  "boot": "manual",
+  "options": {
+    "api_key": "",
+    "province": "Groningen",
+    "days_to_forecast": 7,
+    "granularity": "Hour"
+  },
+  "schema": {
+    "api_key": "str",
+    "province": "str",
+    "days_to_forecast": "int",
+    "granularity": "str"
+  },
+  "image": "ghcr.io/nielsvbrecht/pv_forecast-{arch}"
+}

@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - hass-addon
     tags:
       - 'v*.*.*' # Trigger on version tags like v1.0.0
 

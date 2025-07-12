@@ -1,0 +1,66 @@
+# This workflow builds, tests, and publishes the Docker image for the Home Assistant addon to GitHub Packages.
+
+name: Docker Publish
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-mock # Ensure test dependencies are installed
+
+      - name: Run tests
+        run: |
+          PYTHONPATH=.:$PYTHONPATH pytest
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine image tags
+        id: meta
+        run: |
+          IMAGE_NAME="ghcr.io/${{ github.repository }}/pv_forecast"
+          TAGS=""
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            TAGS="${IMAGE_NAME}:latest"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAGS="${IMAGE_NAME}:${{ github.ref_name }}"
+          fi
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./pv-forecast-addon/Dockerfile
+          platforms: linux/amd64,linux/aarch64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

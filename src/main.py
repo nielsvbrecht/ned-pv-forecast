@@ -3,6 +3,7 @@
 # Import necessary libraries
 import sys
 from datetime import datetime, timedelta
+
 import requests
 
 # API_KEY is now passed as a command-line argument
@@ -58,7 +59,8 @@ def get_pv_forecast(province_name, api_key, start_date, end_date):
     # Use a try-except block to handle potential request errors
     try:
         # Send a GET request to the API with the defined headers and parameters
-        response = requests.get(API_URL, headers=headers, params=params)
+        # Added timeout to prevent hanging
+        response = requests.get(API_URL, headers=headers, params=params, timeout=30)
         # Raise an HTTPError for bad responses (4xx or 5xx)
         response.raise_for_status()  # Raise an error for bad responses
         # Parse the JSON response and return it

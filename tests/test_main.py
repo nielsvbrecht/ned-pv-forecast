@@ -1,3 +1,4 @@
+# pylint: disable=unused-import, duplicate-code
 """Tests for the PV forecast script."""
 
 from datetime import datetime

@@ -1,3 +1,5 @@
+"""A script to fetch photovoltaic generation forecasts using the ned.nl API."""
+
 # Import necessary libraries
 import requests
 import sys
@@ -49,8 +51,8 @@ def get_pv_forecast(province_name, api_key, start_date, end_date):
         "granularity": 5, # Data granularity (5 for Hour based on API docs, adjust if needed)
         "granularitytimezone": 0, # Granularity timezone (0 for UTC)
         "activity": 1, # Activity type (1 for Providing - generation)
-        "validfrom[after]": start_date.strftime('%Y-%m-%d'), # Start date for the forecast (inclusive)
-        "validfrom[strictly_before]": end_date.strftime('%Y-%m-%d'), # End date for the forecast (exclusive)
+        "validfrom[after]": start_date.strftime('%Y-%m-%d'), # Start date (inclusive)
+        "validfrom[strictly_before]": end_date.strftime('%Y-%m-%d'), # End date (exclusive)
     }
 
     # Use a try-except block to handle potential request errors
@@ -72,7 +74,8 @@ def get_pv_forecast(province_name, api_key, start_date, end_date):
 def process_forecast_data(data):
     """Process the forecast data and extract relevant information."""
     # The structure of the response might be different, adjust parsing accordingly
-    # Check if the data is valid and contains the 'hydra:member' key (where forecast entries are located)
+    # Check if the data is valid and contains the 'hydra:member' key
+    # (where forecast entries are located)
     if data and 'hydra:member' in data:
         # Extract the list of forecast entries
         forecast_entries = data['hydra:member']
@@ -92,7 +95,8 @@ def process_forecast_data(data):
                 # Print the extracted forecast information for each entry
                 print(f"From: {date_from}, To: {date_to}, Volume: {volume} kWh")
         else:
-            # Print a message if no forecast data is available for the selected criteria
+            # Print a message if no forecast data is available
+            # for the selected criteria
             print("No forecast data available for the selected province and criteria.")
     else:
         # Print a message for invalid or empty data received
@@ -100,7 +104,9 @@ def process_forecast_data(data):
 
 # Define the main function to run the script
 def main():
-    # Check if the correct number of command-line arguments is provided (at least 2 required)
+    """Main function to parse arguments and fetch/process PV forecast."""
+    # Check if the correct number of command-line arguments is provided
+    # (at least 2 required)
     if len(sys.argv) < 3:
         if len(sys.argv) == 1:
             print("Error: API key and province name are missing.")

@@ -12,6 +12,9 @@ on:
 
 jobs:
   build_and_publish:
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
 
     steps:

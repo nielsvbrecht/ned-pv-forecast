@@ -1,7 +1,10 @@
-import pytest
+"""Tests for the PV forecast script."""
+
+from datetime import datetime
 from unittest.mock import MagicMock
-from datetime import datetime, timedelta
-import requests # Import the requests library
+
+import pytest
+import requests
 
 # Import the function to be tested
 from src.main import get_pv_forecast
@@ -16,11 +19,14 @@ def test_get_pv_forecast_success(mocker):
     mock_response.status_code = 200
     mock_response.json.return_value = {
         'hydra:member': [
-            {'validfrom': '2025-07-12T00:00:00+00:00', 'validto': '2025-07-12T01:00:00+00:00', 'volume': 100},
-            {'validfrom': '2025-07-12T01:00:00+00:00', 'validto': '2025-07-12T02:00:00+00:00', 'volume': 150},
+            {'validfrom': '2025-07-12T00:00:00+00:00',
+             'validto': '2025-07-12T01:00:00+00:00', 'volume': 100},
+            {'validfrom': '2025-07-12T01:00:00+00:00',
+             'validto': '2025-07-12T02:00:00+00:00', 'volume': 150},
         ]
     }
-    mock_response.raise_for_status.return_value = None # Simulate no HTTP errors
+    # Simulate no HTTP errors
+    mock_response.raise_for_status.return_value = None
     mock_get.return_value = mock_response
 
     # Define test data
@@ -58,8 +64,10 @@ def test_get_pv_forecast_success(mocker):
 
     assert forecast_data == {
         'hydra:member': [
-            {'validfrom': '2025-07-12T00:00:00+00:00', 'validto': '2025-07-12T01:00:00+00:00', 'volume': 100},
-            {'validfrom': '2025-07-12T01:00:00+00:00', 'validto': '2025-07-12T02:00:00+00:00', 'volume': 150},
+            {'validfrom': '2025-07-12T00:00:00+00:00',
+             'validto': '2025-07-12T01:00:00+00:00', 'volume': 100},
+            {'validfrom': '2025-07-12T01:00:00+00:00',
+             'validto': '2025-07-12T02:00:00+00:00', 'volume': 150},
         ]
     }
 
@@ -69,7 +77,9 @@ def test_get_pv_forecast_api_error(mocker):
     mock_get = mocker.patch('src.main.requests.get')
 
     # Configure the mock to raise an HTTPError
-    mock_get.side_effect = requests.exceptions.RequestException("Simulated API Error")
+    mock_get.side_effect = requests.exceptions.RequestException(
+        "Simulated API Error"
+    )
 
     # Define test data
     province_name = "Friesland"

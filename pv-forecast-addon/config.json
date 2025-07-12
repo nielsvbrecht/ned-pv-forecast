@@ -1,6 +1,6 @@
 {
   "name": "PV Forecast",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "slug": "pv_forecast",
   "description": "Fetches PV generation forecast using the ned.nl API",
   "arch": ["amd64", "aarch64"],

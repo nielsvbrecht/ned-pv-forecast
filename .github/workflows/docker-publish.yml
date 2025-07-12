@@ -21,13 +21,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Read version from file
-        id: get_version # Assign an ID to this step to access its outputs
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Read version from config.json
+        id: get_version
         run: |
-          VERSION=$(cat VERSION) # Read content of VERSION file
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT" # Set it as an output for this step
-          # Make sure the VERSION file exists at the root of your repo,
-          # or adjust the path: $(cat path/to/your/VERSION)
+          VERSION=$(jq -r '.version' pv-forecast-addon/config.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -54,32 +55,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-    #   - name: Determine image tags
-    #     id: meta
-    #     run: |
-    #       IMAGE_NAME="ghcr.io/${{ github.repository }}/pv_forecast"
-    #       TAGS=""
-    #       if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-    #         TAGS="${IMAGE_NAME}:latest"
-    #       elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-    #         TAGS="${IMAGE_NAME}:${{ github.ref_name }}"
-    #       fi
-    #       echo "tags=${TAGS}" >> $GITHUB_OUTPUT
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            my-docker-hub-username/my-app
-            ghcr.io/${{ github.repository }}
+            ghcr.io/${{ github.repository }}/pv_forecast
           tags: |
-            type=raw,value=${{ steps.get_version.outputs.version }} # Use the version from your file
+            # Tag with the version from config.json on any push
+            type=raw,value=${{ steps.get_version.outputs.version }}
+            # Tag with 'latest' on pushes to the default branch
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
-            type=ref,event=branch,enable=${{ github.event_name == 'pull_request' }} # For PRs, use branch name
-            type=sha,format=short,enable=${{ github.event_name == 'pull_request' }} # Short SHA for PRs
-            # You can still include other tags from git metadata if desired,
-            # but using your file as the primary version is the goal here.
-            # Example: type=semver,pattern={{version}} # if your git tags match semver
+            # Tag with the git tag name on version tag pushes
+            type=ref,event=tag
+            # Tag with the branch name on branch pushes (excluding default branch)
+            type=ref,event=branch,enable=${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

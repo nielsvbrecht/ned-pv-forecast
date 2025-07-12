@@ -3,7 +3,6 @@
 # Import necessary libraries
 import sys
 from datetime import datetime, timedelta
-
 import requests
 
 # API_KEY is now passed as a command-line argument

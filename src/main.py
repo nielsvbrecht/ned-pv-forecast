@@ -1,9 +1,9 @@
 """A script to fetch photovoltaic generation forecasts using the ned.nl API."""
 
 # Import necessary libraries
-import requests
 import sys
 from datetime import datetime, timedelta
+import requests
 
 # API_KEY is now passed as a command-line argument
 # Define the base URL for the NED.nl API utilizations endpoint

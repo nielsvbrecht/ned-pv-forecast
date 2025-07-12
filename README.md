@@ -101,6 +101,10 @@ This project can be used as a Home Assistant addon. Follow these steps to add an
 2. Click on the **Start** button.
 3. You can check the addon logs in the **Log** tab to see the fetched forecast data.
 
+## Status
+
+[![Docker Publish](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/docker-publish.yml)
+
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.

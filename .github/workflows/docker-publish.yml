@@ -9,7 +9,7 @@ on:
       - hass-addon
     tags:
       - 'v*.*.*' # Trigger on version tags like v1.0.0
-
+      - 'v*.*.*-*'
 jobs:
   build_and_publish:
     permissions:

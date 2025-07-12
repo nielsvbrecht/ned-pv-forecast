@@ -3,8 +3,8 @@
 # Import necessary libraries
 import sys
 from datetime import datetime, timedelta
-import requests
 import os
+import requests
 
 # API_KEY is now passed as a command-line argument
 # Define the base URL for the NED.nl API utilizations endpoint
@@ -140,7 +140,11 @@ def main():
     # Get granularity ID from string
     granularity_id = GRANULARITY_MAPPING.get(granularity_str)
     if granularity_id is None:
-        print(f"Error: Invalid value for GRANULARITY: '{granularity_str}'. Allowed values are {list(GRANULARITY_MAPPING.keys())}.")
+        error_message = (
+            f"Error: Invalid value for GRANULARITY: '{granularity_str}'. "
+            f"Allowed values are {list(GRANULARITY_MAPPING.keys())}."
+        )
+        print(error_message)
         sys.exit(1)
 
     # Calculate the date range based on the determined number of days

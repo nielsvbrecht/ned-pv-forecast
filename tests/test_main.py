@@ -37,7 +37,7 @@ def test_get_pv_forecast_success(mocker):
     end_date = datetime(2025, 7, 13)
 
     # Call the function
-    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date)
+    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date, granularity_id=5)
 
     # Assertions
     expected_url = "https://api.ned.nl/v1/utilizations"
@@ -89,7 +89,7 @@ def test_get_pv_forecast_api_error(mocker):
     end_date = datetime(2025, 7, 13)
 
     # Call the function
-    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date)
+    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date, granularity_id=5)
 
     # Assertions
     # Ensure the function returned None on error
@@ -110,7 +110,7 @@ def test_get_pv_forecast_invalid_province(mocker):
     end_date = datetime(2025, 7, 13)
 
     # Call the function
-    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date)
+    forecast_data = get_pv_forecast(province_name, api_key, start_date, end_date, granularity_id=5)
 
     # Assertions
     # Ensure the function returned None for an invalid province

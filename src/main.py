@@ -57,7 +57,7 @@ def get_pv_forecast(province_name, api_key, start_date, end_date, granularity_id
         "point": point_id, # Geographic point (province ID)
         "type": 2, # Energy carrier type (2 for Solar based on API docs)
         "classification": 1, # Data classification (1 for Forecast based on API docs)
-        "granularity": granularity_id, # Data granularity (5 for Hour based on API docs, adjust if needed)
+        "granularity": granularity_id, # Data granularity (10m,15m, 30m, 1hr)
         "granularitytimezone": 0, # Granularity timezone (0 for UTC)
         "activity": 1, # Activity type (1 for Providing - generation)
         "validfrom[after]": start_date.strftime('%Y-%m-%d'), # Start date (inclusive)

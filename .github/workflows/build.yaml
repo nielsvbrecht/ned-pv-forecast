@@ -1,0 +1,43 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install homeassistant pytest pytest-homeassistant-custom-component pylint black
+          pip install -r requirements.txt
+          
+      - name: Run tests
+        run: |
+          pytest tests/
+
+      - name: Lint with pylint
+        run: |
+          pylint custom_components/pv_forecast
+
+      - name: Check formatting with black
+        run: |
+          black --check custom_components/pv_forecast
+
+      - name: Validate with hassfest
+        uses: home-assistant/actions/hassfest@master

@@ -1,0 +1,11 @@
+{
+  "domain": "pv_forecast",
+  "name": "PV Forecast NED.nl",
+  "codeowners": ["@nielsvbrecht"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/nielsvbrecht/ned-pv-forecast",
+  "iot_class": "cloud_polling",
+  "requirements": ["requests"],
+  "version": "0.1.0"
+}

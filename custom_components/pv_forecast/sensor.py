@@ -48,11 +48,11 @@ async def async_setup_entry(
     for period_id, period_info in FORECAST_PERIODS.items():
         sensors.append(
             PVForecastSensor(
-                coordinator,
-                period_id,
-                period_info["days"],
-                period_info["name"],
-                config_entry.entry_id,
+                coordinator=coordinator,
+                period_id=period_id,
+                days_ahead=period_info["days"],
+                period_name=period_info["name"],
+                entry_id=config_entry.entry_id,
             )
         )
 
@@ -69,6 +69,7 @@ class PVForecastSensor(CoordinatorEntity, SensorEntity):
     def __init__(
         self,
         coordinator: PVForecastDataUpdateCoordinator,
+        *,  # Force remaining arguments to be keyword-only
         period_id: str,
         days_ahead: int,
         period_name: str,

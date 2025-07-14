@@ -1,5 +1,5 @@
 """DataUpdateCoordinator for PV Forecast NED.nl."""
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from typing import Any
 

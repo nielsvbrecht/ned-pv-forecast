@@ -2,6 +2,10 @@
 
 This project provides a Home Assistant integration to fetch photovoltaic (PV) generation forecasts for provinces in the Netherlands using the ned.nl API.
 
+## Future plans
+
+* Change to the ned.nl postal code API (once available) to provide users insight into their predicted PV production.
+
 ## Installation in Home Assistant
 
 There are two ways to install this integration:
@@ -39,15 +43,11 @@ The integration will create sensors showing the forecasted PV generation for you
 
 ## Standalone Usage
 
-If you want to use this as a standalone Python script instead of a Home Assistant integration, check out the [standalone branch](https://github.com/nielsvbrecht/ned-pv-forecast/tree/standalone).
+If you want to use this as a standalone Python script instead of a Home Assistant integration, check out the src folder.
 
 ## API Information
 
 This project interacts with the ned.nl API to retrieve photovoltaic generation forecasts. Ensure you have the necessary API access and credentials if required.
-
-## Status
-
-[![Docker Publish](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/docker-publish.yml)
 
 ## Contributing
 

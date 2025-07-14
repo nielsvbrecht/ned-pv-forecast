@@ -24,11 +24,16 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Read version from config.json
+      - name: Read version from VERSION file
         id: get_version
         run: |
-          VERSION=$(jq -r '.version' pv-forecast-addon/config.json)
+          VERSION=$(cat VERSION)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update version in config.json
+        run: |
+          jq '.version = "${{ steps.get_version.outputs.version }}"' pv-forecast-addon/config.json > pv-forecast-addon/config.json.tmp
+          mv pv-forecast-addon/config.json.tmp pv-forecast-addon/config.json
 
       - name: Set up Python
         uses: actions/setup-python@v3

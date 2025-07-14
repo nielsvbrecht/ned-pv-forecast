@@ -1,5 +1,5 @@
 """DataUpdateCoordinator for PV Forecast NED.nl."""
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 from typing import Any
 
@@ -12,9 +12,9 @@ import requests
 
 from .const import (
     DOMAIN,
-    DEFAULT_SCAN_INTERVAL,
     PROVINCE_MAPPING,
     GRANULARITY_MAPPING,
+    SCAN_INTERVAL_OPTIONS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ class PVForecastDataUpdateCoordinator(DataUpdateCoordinator):
         province: str,
         days_to_forecast: int = 7,
         granularity: str = "Hour",
+        scan_interval: str = "6 hours",
     ) -> None:
         """Initialize."""
         self.api_key = api_key
@@ -38,11 +39,14 @@ class PVForecastDataUpdateCoordinator(DataUpdateCoordinator):
         self.days_to_forecast = days_to_forecast
         self.granularity = granularity
 
+        update_interval = SCAN_INTERVAL_OPTIONS[scan_interval]
+        _LOGGER.debug("Setting update interval to %s", update_interval)
+
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
+            update_interval=update_interval,
         )
 
     async def _async_update_data(self) -> dict[str, Any]:

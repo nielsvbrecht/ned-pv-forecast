@@ -13,10 +13,13 @@ from .const import (
     CONF_PROVINCE,
     CONF_DAYS_TO_FORECAST,
     CONF_GRANULARITY,
+    CONF_SCAN_INTERVAL,
     DEFAULT_DAYS_TO_FORECAST,
     DEFAULT_GRANULARITY,
+    DEFAULT_SCAN_INTERVAL,
     PROVINCE_MAPPING,
     GRANULARITY_OPTIONS,
+    SCAN_INTERVAL_OPTIONS,
 )
 
 
@@ -59,6 +62,9 @@ class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional(
                         CONF_GRANULARITY, default=DEFAULT_GRANULARITY
                     ): vol.In(GRANULARITY_OPTIONS),
+                    vol.Optional(
+                        CONF_SCAN_INTERVAL, default="6 hours"
+                    ): vol.In(list(SCAN_INTERVAL_OPTIONS.keys())),
                 }
             ),
             errors=errors,

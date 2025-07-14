@@ -1,18 +1,27 @@
 """Constants for the PV Forecast integration."""
 from typing import Final
+from datetime import timedelta
 
 DOMAIN: Final = "pv_forecast"
-DEFAULT_SCAN_INTERVAL = 3600  # 1 hour
 
 # Configuration and options
 CONF_API_KEY = "api_key"
 CONF_PROVINCE = "province"
 CONF_DAYS_TO_FORECAST = "days_to_forecast"
 CONF_GRANULARITY = "granularity"
+CONF_SCAN_INTERVAL = "scan_interval"
 
 # Defaults
 DEFAULT_DAYS_TO_FORECAST = 7
 DEFAULT_GRANULARITY = "Hour"
+DEFAULT_SCAN_INTERVAL = timedelta(hours=6)  # 6 hours default
+
+# Scan interval options
+SCAN_INTERVAL_OPTIONS = {
+    "6 hours": timedelta(hours=6),
+    "12 hours": timedelta(hours=12),
+    "24 hours": timedelta(hours=24),
+}
 
 # Province mapping
 PROVINCE_MAPPING = {

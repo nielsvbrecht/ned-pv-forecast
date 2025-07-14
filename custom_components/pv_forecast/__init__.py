@@ -11,6 +11,7 @@ from .const import (
     CONF_PROVINCE,
     CONF_DAYS_TO_FORECAST,
     CONF_GRANULARITY,
+    CONF_SCAN_INTERVAL,
 )
 from .coordinator import PVForecastDataUpdateCoordinator
 
@@ -27,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         province=entry.data[CONF_PROVINCE],
         days_to_forecast=entry.data.get(CONF_DAYS_TO_FORECAST, 7),
         granularity=entry.data.get(CONF_GRANULARITY, "Hour"),
+        scan_interval=entry.data.get(CONF_SCAN_INTERVAL, "6 hours"),
     )
 
     await coordinator.async_config_entry_first_refresh()

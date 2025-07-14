@@ -84,6 +84,10 @@ To set up the development environment:
    pylint custom_components/pv_forecast
    ```
 
+## Status
+
+[![Pylint](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/pylint.yml/badge.svg)](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/pylint.yml)
+
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.

@@ -1,0 +1,59 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'VERSION'
+      - 'custom_components/**'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: get_version
+        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      - name: Get changed files
+        id: changed
+        run: |
+          echo "files=$(git diff --name-only HEAD^ HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "### Changes in this release" > changelog.md
+          echo "" >> changelog.md
+          echo "Changed files:" >> changelog.md
+          for file in ${{ steps.changed.outputs.files }}; do
+            echo "- \`$file\`" >> changelog.md
+          done
+          echo "" >> changelog.md
+          echo "Full changelog: [View on GitHub](https://github.com/${{ github.repository }}/commits/main)" >> changelog.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body_path: changelog.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update HACS
+        uses: "hacs/action@main"
+        with:
+          category: "integration"

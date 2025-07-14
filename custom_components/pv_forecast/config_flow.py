@@ -5,9 +5,7 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
-import homeassistant.helpers.config_validation as cv
 
 from .const import (
     DOMAIN,
@@ -20,6 +18,7 @@ from .const import (
     PROVINCE_MAPPING,
     GRANULARITY_OPTIONS,
 )
+
 
 class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PV Forecast NED.nl."""
@@ -35,9 +34,9 @@ class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Validate the API key by trying to get data
             valid = await self.hass.async_add_executor_job(
-                self._test_api_key, 
+                self._test_api_key,
                 user_input[CONF_API_KEY],
-                user_input[CONF_PROVINCE]
+                user_input[CONF_PROVINCE],
             )
 
             if valid:
@@ -45,7 +44,7 @@ class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=f"PV Forecast NED.nl - {user_input[CONF_PROVINCE]}",
                     data=user_input,
                 )
-            
+
             errors["base"] = "invalid_auth"
 
         return self.async_show_form(
@@ -55,12 +54,10 @@ class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_API_KEY): str,
                     vol.Required(CONF_PROVINCE): vol.In(PROVINCE_MAPPING.keys()),
                     vol.Optional(
-                        CONF_DAYS_TO_FORECAST, 
-                        default=DEFAULT_DAYS_TO_FORECAST
+                        CONF_DAYS_TO_FORECAST, default=DEFAULT_DAYS_TO_FORECAST
                     ): vol.All(vol.Coerce(int), vol.Range(min=1, max=7)),
                     vol.Optional(
-                        CONF_GRANULARITY, 
-                        default=DEFAULT_GRANULARITY
+                        CONF_GRANULARITY, default=DEFAULT_GRANULARITY
                     ): vol.In(GRANULARITY_OPTIONS),
                 }
             ),
@@ -72,7 +69,7 @@ class PVForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             # Import here to avoid circular import
             from .coordinator import PVForecastDataUpdateCoordinator
-            
+
             coordinator = PVForecastDataUpdateCoordinator(
                 self.hass,
                 api_key=api_key,

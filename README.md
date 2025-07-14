@@ -49,6 +49,41 @@ If you want to use this as a standalone Python script instead of a Home Assistan
 
 This project interacts with the ned.nl API to retrieve photovoltaic generation forecasts. Ensure you have the necessary API access and credentials if required.
 
+## Development
+
+To set up the development environment:
+
+1. Create a virtual environment and activate it:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+2. Install development dependencies:
+
+   ```bash
+   pip install -r requirements_dev.txt
+   ```
+
+3. Install pre-commit hooks:
+
+   ```bash
+   pre-commit install
+   ```
+
+4. Run tests:
+
+   ```bash
+   pytest
+   ```
+
+5. Check code style:
+
+   ```bash
+   pylint custom_components/pv_forecast
+   ```
+
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.

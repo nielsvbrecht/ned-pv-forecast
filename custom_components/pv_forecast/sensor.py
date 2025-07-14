@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any
+from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -22,6 +23,17 @@ from .coordinator import PVForecastDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+# Define forecast periods
+FORECAST_PERIODS = {
+    "today": {"days": 0, "name": "Today"},
+    "tomorrow": {"days": 1, "name": "Tomorrow"},
+    "in_2_days": {"days": 2, "name": "In 2 Days"},
+    "in_3_days": {"days": 3, "name": "In 3 Days"},
+    "in_4_days": {"days": 4, "name": "In 4 Days"},
+    "in_5_days": {"days": 5, "name": "In 5 Days"},
+    "in_6_days": {"days": 6, "name": "In 6 Days"},
+}
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -31,17 +43,18 @@ async def async_setup_entry(
     """Set up the PV Forecast NED.nl sensors."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
 
-    # Create a sensor for each forecast period
+    # Create a fixed set of forecast sensors
     sensors = []
-    if coordinator.data and "hydra:member" in coordinator.data:
-        for entry in coordinator.data["hydra:member"]:
-            sensors.append(
-                PVForecastSensor(
-                    coordinator,
-                    entry["validfrom"],
-                    config_entry.entry_id,
-                )
+    for period_id, period_info in FORECAST_PERIODS.items():
+        sensors.append(
+            PVForecastSensor(
+                coordinator,
+                period_id,
+                period_info["days"],
+                period_info["name"],
+                config_entry.entry_id,
             )
+        )
 
     async_add_entities(sensors, True)
 
@@ -56,39 +69,57 @@ class PVForecastSensor(CoordinatorEntity, SensorEntity):
     def __init__(
         self,
         coordinator: PVForecastDataUpdateCoordinator,
-        timestamp: str,
+        period_id: str,
+        days_ahead: int,
+        period_name: str,
         entry_id: str,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._timestamp = timestamp
+        self._period_id = period_id
+        self._days_ahead = days_ahead
         self._entry_id = entry_id
-        self._attr_unique_id = f"{entry_id}_{timestamp}"
-        self._attr_name = f"PV Forecast NED.nl {timestamp}"
+        self._attr_unique_id = f"{entry_id}_{period_id}"
+        self._attr_name = f"PV Forecast NED.nl {period_name}"
 
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if (
-            self.coordinator.data
-            and "hydra:member" in self.coordinator.data
-        ):
-            for entry in self.coordinator.data["hydra:member"]:
-                if entry["validfrom"] == self._timestamp:
-                    return float(entry["volume"])
-        return None
+        if not self.coordinator.data or "hydra:member" not in self.coordinator.data:
+            return None
+
+        # Calculate the date we're looking for
+        target_date = datetime.now().date() + timedelta(days=self._days_ahead)
+        daily_total = 0.0
+
+        # Sum up all values for the target date
+        for entry in self.coordinator.data["hydra:member"]:
+            entry_date = datetime.fromisoformat(entry["validfrom"]).date()
+            if entry_date == target_date:
+                daily_total += float(entry["volume"])
+
+        return daily_total if daily_total > 0 else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return the state attributes."""
-        if (
-            self.coordinator.data
-            and "hydra:member" in self.coordinator.data
-        ):
+        target_date = datetime.now().date() + timedelta(days=self._days_ahead)
+        entries = []
+
+        if self.coordinator.data and "hydra:member" in self.coordinator.data:
             for entry in self.coordinator.data["hydra:member"]:
-                if entry["validfrom"] == self._timestamp:
-                    return {
-                        "valid_from": entry["validfrom"],
-                        "valid_to": entry["validto"],
-                    }
-        return {}
+                entry_date = datetime.fromisoformat(entry["validfrom"]).date()
+                if entry_date == target_date:
+                    entries.append(
+                        {
+                            "valid_from": entry["validfrom"],
+                            "valid_to": entry["validto"],
+                            "volume": entry["volume"],
+                        }
+                    )
+
+        return {
+            "forecast_date": target_date.isoformat(),
+            "period_name": FORECAST_PERIODS[self._period_id]["name"],
+            "hourly_data": entries,
+        }

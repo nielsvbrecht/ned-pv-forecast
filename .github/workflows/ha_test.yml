@@ -1,0 +1,54 @@
+name: Home Assistant Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v4"
+      
+      - name: HACS Action
+        uses: "hacs/action@main"
+        with:
+          category: "integration"
+          
+      - name: hassfest
+        uses: home-assistant/actions/hassfest@master
+
+  home_assistant_test:
+    name: Home Assistant Integration Tests
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v4"
+      
+      - name: Set up Python
+        uses: "actions/setup-python@v4"
+        with:
+          python-version: "3.11"
+          
+      - name: Install requirements
+        run: |
+          pip install -r requirements_dev.txt
+          
+      - name: Run Home Assistant tests
+        run: |
+          pytest tests/test_integration.py -v --cov=custom_components/pv_forecast --cov-report=xml
+          
+      - name: Check for validation errors
+        run: |
+          python -m script.hassfest
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: integration
+          name: codecov-umbrella
+          fail_ci_if_error: true

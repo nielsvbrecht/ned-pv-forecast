@@ -1,6 +1,7 @@
 homeassistant>=2025.7.2
-pylint
-pylint-strict-informational
-pytest
-pytest-cov
+pylint==2.17.4
+pylint-strict-informational==0.1
+pytest==7.4.0
+pytest-cov==4.1.0
 pytest-homeassistant-custom-component
+pytest-asyncio

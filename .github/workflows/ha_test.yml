@@ -39,6 +39,7 @@ jobs:
           
       - name: Run Home Assistant tests
         run: |
+          export PYTHONPATH=$PWD
           pytest tests/test_integration.py -v --cov=custom_components/pv_forecast --cov-report=xml
           
       - name: Check for validation errors

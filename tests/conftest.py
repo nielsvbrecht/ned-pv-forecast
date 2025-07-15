@@ -28,7 +28,7 @@ def mock_api_response():
     }
 
 @pytest.fixture
-def mock_config_entry(hass):
+def mock_config_entry():
     """Create a mock config entry."""
     return {
         "api_key": "test_api_key",

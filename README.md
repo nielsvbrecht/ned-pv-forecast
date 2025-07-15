@@ -1,16 +1,40 @@
 # PV Forecast NED.nl
 
-This project provides a Home Assistant integration to fetch photovoltaic (PV) generation forecasts for provinces in the Netherlands using the ned.nl API.
+This Home Assistant integration provides forecast data for photovoltaic (PV) energy generation in the Netherlands using the ned.nl API. Get accurate predictions for your province's solar power generation up to 7 days in advance.
 
-## Future plans
+![PV Forecast Example](examples/dashboard.png)
 
-* Change to the ned.nl postal code API (once available) to provide users insight into their predicted PV production.
+## Features
 
-## Installation in Home Assistant
+- Province-based PV generation forecasts
+- Forecasts available up to 7 days ahead
+- Configurable data granularity (10 minutes, 15 minutes, Hour, or Day)
+- Adjustable update intervals (6 hours, 12 hours, or daily)
+- Easy integration with Home Assistant energy dashboard
 
-There are two ways to install this integration:
+## Requirements
 
-### Method 1: HACS (Recommended)
+Before installing this integration, you'll need:
+
+1. A ned.nl account with API access
+2. An API key from ned.nl
+3. Home Assistant 2024.1.3 or newer
+
+## Getting API Access
+
+1. Go to [ned.nl](https://ned.nl) and create an account
+2. Navigate to your profile settings
+3. Under "API Access", click "Request API Access"
+4. Fill in the required information:
+   - Organization name
+   - Intended use
+   - Expected request volume
+5. Once approved, you'll receive your API key via email
+6. Save this API key, you'll need it during integration setup
+
+## Installation
+
+### HACS (Recommended)
 
 1. Install [HACS](https://hacs.xyz/) if you haven't already
 2. Go to HACS in your Home Assistant instance
@@ -20,13 +44,13 @@ There are two ways to install this integration:
 6. Click "Download"
 7. Restart Home Assistant
 
-### Method 2: Manual Installation
+### Manual Installation
 
 1. Copy the `custom_components/pv_forecast` directory from this repository
 2. Paste it into your Home Assistant's `custom_components` directory
 3. Restart Home Assistant
 
-### Configuration
+## Configuration
 
 After installation:
 
@@ -34,60 +58,94 @@ After installation:
 2. Click "+ ADD INTEGRATION"
 3. Search for "PV Forecast NED.nl"
 4. Fill in the required information:
-   * Your NED.nl API key
-   * Province
-   * Days to forecast (1-7)
-   * Data granularity (10 minutes, 15 minutes, Hour, or Day)
+   - Your NED.nl API key
+   - Province (choose your province)
+   - Days to forecast (1-7)
+   - Data granularity (10 minutes, 15 minutes, Hour, or Day)
+   - Update interval (6 hours, 12 hours, or once per day)
 
-The integration will create sensors showing the forecasted PV generation for your selected province.
+## Available Sensors
 
-## Standalone Usage
+The integration creates the following sensors:
 
-If you want to use this as a standalone Python script instead of a Home Assistant integration, check out the src folder.
+- `sensor.pv_forecast_ned_nl_today`: Today's forecast
+- `sensor.pv_forecast_ned_nl_tomorrow`: Tomorrow's forecast
+- `sensor.pv_forecast_ned_nl_in_2_days`: Forecast for 2 days ahead
+- And so on up to 7 days ahead
 
-## API Information
+Each sensor provides:
 
-This project interacts with the ned.nl API to retrieve photovoltaic generation forecasts. Ensure you have the necessary API access and credentials if required.
+- State: Total expected kWh for that day
+- Attributes:
+  - forecast_date: The date of the forecast
+  - period_name: Human-readable name (Today, Tomorrow, etc.)
+  - hourly_data: Detailed hourly breakdown of the forecast
 
-## Development
+## Using the Integration
 
-To set up the development environment:
+### Energy Dashboard
 
-1. Create a virtual environment and activate it:
+Add the forecast to your Energy Dashboard:
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+1. Go to Energy → Settings
+2. Under "Solar Production Forecast", click "Add Solar Production Forecast"
+3. Select the "PV Forecast NED.nl Today" sensor
 
-2. Install development dependencies:
+### Example Automations
 
-   ```bash
-   pip install -r requirements_dev.txt
-   ```
+Here's an example automation that notifies you when tomorrow's forecast is particularly good:
 
-3. Install pre-commit hooks:
+```yaml
+automation:
+  - alias: "High PV Production Tomorrow"
+    trigger:
+      - platform: state
+        entity_id: sensor.pv_forecast_ned_nl_tomorrow
+    condition:
+      - condition: numeric_state
+        entity_id: sensor.pv_forecast_ned_nl_tomorrow
+        above: 20.0  # kWh
+    action:
+      - service: notify.mobile_app
+        data:
+          message: "Good solar production expected tomorrow: {{ states('sensor.pv_forecast_ned_nl_tomorrow') }} kWh"
+```
 
-   ```bash
-   pre-commit install
-   ```
+## Troubleshooting
 
-4. Run tests:
+### Common Issues
 
-   ```bash
-   pytest
-   ```
+1. **API Key Invalid**
+   - Double-check your API key
+   - Ensure your API access hasn't expired
+   - Contact ned.nl support if issues persist
 
-5. Check code style:
+2. **No Data Available**
+   - Check your internet connection
+   - Verify the selected province
+   - Make sure the update interval has passed
 
-   ```bash
-   pylint custom_components/pv_forecast
-   ```
+3. **Integration Not Showing Up**
+   - Clear your browser cache
+   - Restart Home Assistant
+   - Check Home Assistant logs for errors
 
-## Status
+### Debug Logging
 
-[![Pylint](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/pylint.yml/badge.svg)](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/pylint.yml)
+To enable debug logs for this integration:
+
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.pv_forecast: debug
+```
 
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.
+
+## Support
+
+- Report bugs via [GitHub Issues](https://github.com/nielsvbrecht/ned-pv-forecast/issues)
+- Join the discussion in the [Home Assistant Community](https://community.home-assistant.io/) forum

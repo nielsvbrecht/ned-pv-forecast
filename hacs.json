@@ -2,7 +2,5 @@
   "name": "PV Forecast NED.nl",
   "homeassistant": "2024.1.3",
   "render_readme": true,
-  "domains": ["sensor"],
-  "country": "NL",
-  "category": "integration"
+  "content_in_root": false
 }

@@ -1,5 +1,4 @@
 homeassistant==2025.7.2
-python_version >= '3.13'
 pylint==2.17.4
 pylint-strict-informational==0.1
 pytest

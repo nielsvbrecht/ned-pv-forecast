@@ -1,0 +1,29 @@
+[MASTER]
+ignore=CVS
+persistent=yes
+load-plugins=
+
+[MESSAGES CONTROL]
+disable=
+    R0903,  # too-few-public-methods
+    R0913,  # too-many-arguments
+    R0801,  # duplicate-code
+    C0301,  # line-too-long
+    E0401,  # import-error for Home Assistant imports
+    C0415,  # import-outside-toplevel (this is a recommended pattern in Home Assistant)
+
+[REPORTS]
+output-format=text
+reports=no
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,ev
+
+[FORMAT]
+max-line-length=88
+max-module-lines=1000
+indent-string='    '
+
+[MISCELLANEOUS]
+notes=FIXME,TODO,XXX,HACK

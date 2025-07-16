@@ -145,6 +145,9 @@ logger:
   logs:
     custom_components.pv_forecast: debug
 ```
+## Status
+
+[![HACS & Home Assistant Integration Tests](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/hacs_ha_test.yml/badge.svg)](https://github.com/nielsvbrecht/ned-pv-forecast/actions/workflows/hacs_ha_test.yml)
 
 ## Contributing
 

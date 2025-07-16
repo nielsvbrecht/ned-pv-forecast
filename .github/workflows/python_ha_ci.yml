@@ -1,4 +1,4 @@
-name: Python CI
+name: Python, HACS & Home Assistant Integration CI
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
           PYTHONPATH=.:$PYTHONPATH pylint $(git ls-files '*.py')
 
   test:
-    name: Python Tests
+    name: Home Assistant Integration Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,3 +43,15 @@ jobs:
         run: |
           export PYTHONPATH=$PWD
           pytest tests/test_sensor_compat.py -v
+
+  hacs_validate:
+    name: HACS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: HACS Action
+        uses: hacs/action@main
+        with:
+          category: integration
+      - name: hassfest
+        uses: home-assistant/actions/hassfest@master

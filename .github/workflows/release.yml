@@ -21,9 +21,21 @@ jobs:
         with:
           fetch-depth: 0
 
+
       - name: Get version
         id: get_version
         run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      - name: Check manifest.json version matches VERSION
+        run: |
+          manifest_version=$(jq -r .version custom_components/pv_forecast/manifest.json)
+          file_version=$(cat VERSION)
+          echo "Manifest version: $manifest_version"
+          echo "VERSION file: $file_version"
+          if [ "$manifest_version" != "$file_version" ]; then
+            echo "ERROR: manifest.json version ($manifest_version) does not match VERSION file ($file_version)"
+            exit 1
+          fi
 
       - name: Get changed files
         id: changed

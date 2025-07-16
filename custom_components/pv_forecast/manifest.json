@@ -8,5 +8,5 @@
   "issue_tracker": "https://github.com/nielsvbrecht/ned-pv-forecast/issues",
   "iot_class": "cloud_polling",
   "requirements": ["requests"],
-  "version": "0.1.2"
+  "version": "0.1.0"
 }

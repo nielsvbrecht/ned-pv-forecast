@@ -12,13 +12,18 @@ This Home Assistant integration provides forecast data for photovoltaic (PV) ene
 - Adjustable update intervals (6 hours, 12 hours, or daily)
 - Easy integration with Home Assistant energy dashboard
 
+
 ## Requirements
+
+**Compatibility:**
+- Python 3.13 or newer
+- Home Assistant 2025.7.2 or newer
 
 Before installing this integration, you'll need:
 
 1. A ned.nl account with API access
 2. An API key from ned.nl
-3. Home Assistant 2024.1.3 or newer
+3. Home Assistant 2025.7.2 or newer
 
 ## Getting API Access
 

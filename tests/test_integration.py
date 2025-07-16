@@ -1,20 +1,23 @@
+
+
 """Tests for Home Assistant integration."""
 from unittest.mock import patch
 import pytest
-from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pv_forecast.const import DOMAIN
 from custom_components.pv_forecast.coordinator import PVForecastDataUpdateCoordinator
 
 
-async def test_setup_entry(hass: HomeAssistant, mock_config_entry, mock_api_response):
+async def test_setup_entry(hass, mock_config_entry, mock_api_response):
     """Test setting up the integration."""
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data=mock_config_entry,
-        entry_id="test",
-    )
+    class ConfigEntry:
+        def __init__(self, domain, data, entry_id):
+            self.domain = domain
+            self.data = data
+            self.entry_id = entry_id
+        def add_to_hass(self, hass):
+            pass
+    config_entry = ConfigEntry(DOMAIN, mock_config_entry, "test")
     with patch(
         "custom_components.pv_forecast.coordinator.PVForecastDataUpdateCoordinator._async_update_data",
         return_value=mock_api_response,
@@ -27,7 +30,7 @@ async def test_setup_entry(hass: HomeAssistant, mock_config_entry, mock_api_resp
         assert state.state == "250.0"
 
 
-async def test_config_flow(hass: HomeAssistant, mock_config_entry):
+async def test_config_flow(hass, mock_config_entry):
     """Test the config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": "user"}
@@ -47,7 +50,7 @@ async def test_config_flow(hass: HomeAssistant, mock_config_entry):
         assert result["data"] == mock_config_entry
 
 
-async def test_coordinator_update(hass: HomeAssistant, mock_config_entry, mock_api_response):
+async def test_coordinator_update(hass, mock_config_entry, mock_api_response):
     """Test the coordinator update."""
     coordinator = PVForecastDataUpdateCoordinator(
         hass,
@@ -71,7 +74,7 @@ async def test_coordinator_update(hass: HomeAssistant, mock_config_entry, mock_a
     ("Groningen", True),
     ("Invalid", False),
 ])
-async def test_province_validation(hass: HomeAssistant, province, expected, mock_config_entry):
+async def test_province_validation(hass, province, expected, mock_config_entry):
     """Test province validation in config flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": "user"}

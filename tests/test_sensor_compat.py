@@ -1,27 +1,21 @@
+
 """Test PVForecastSensor compatibility with Python 3.13 and Home Assistant 2025.7"""
-import pytest
 from datetime import datetime, timedelta
 from custom_components.pv_forecast.sensor import PVForecastSensor, FORECAST_PERIODS
-
-
 from custom_components.pv_forecast.coordinator import PVForecastDataUpdateCoordinator
-import types
 
 class MockCoordinator(PVForecastDataUpdateCoordinator):
+    """Mock coordinator for testing PVForecastSensor."""
     def __init__(self, data):
-        # Bypass parent init
+        super().__init__(hass=None, api_key="test", province="Groningen")
         self.data = data
-        self.hass = None
-        self.api_key = "test"
-        self.province = "Groningen"
-        self.days_to_forecast = 7
-        self.granularity = "Hour"
-        self._logger = None
-        self.update_interval = None
     async def _async_update_data(self):
+        """Mock async update data."""
         return self.data
 
+
 def make_entry(validfrom, validto, volume):
+    """Create a mock API entry."""
     return {
         "validfrom": validfrom,
         "validto": validto,
@@ -29,7 +23,9 @@ def make_entry(validfrom, validto, volume):
     }
 
 
+
 def test_native_value_and_attributes_today():
+    """Test native_value and extra_state_attributes for today."""
     today = datetime.now().date()
     validfrom = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     validto = (datetime.now() + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0).isoformat()
@@ -50,7 +46,9 @@ def test_native_value_and_attributes_today():
     assert float(attrs["hourly_data"][0]["volume"]) == 123.45
 
 
+
 def test_native_value_none_for_missing_data():
+    """Test native_value and attributes when no data is present."""
     coordinator = MockCoordinator({})
     sensor = PVForecastSensor(
         coordinator=coordinator,
@@ -60,13 +58,14 @@ def test_native_value_none_for_missing_data():
         entry_id="test"
     )
     assert sensor.native_value is None
-    assert sensor.extra_state_attributes["hourly_data"] == []
+    assert not sensor.extra_state_attributes["hourly_data"]
+
 
 def test_forecast_periods_dict():
-    # Validate forecast periods for Home Assistant compatibility
+    """Test forecast periods dict for Home Assistant compatibility."""
     assert set(FORECAST_PERIODS.keys()) == {
         "today", "tomorrow", "in_2_days", "in_3_days", "in_4_days", "in_5_days", "in_6_days"
     }
-    for period, info in FORECAST_PERIODS.items():
+    for info in FORECAST_PERIODS.values():
         assert isinstance(info["days"], int)
         assert isinstance(info["name"], str)

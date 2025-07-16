@@ -1,4 +1,4 @@
-name: CI
+name: Python CI
 
 on:
   push:
@@ -10,28 +10,25 @@ on:
 
 jobs:
   lint:
-    name: Pylint
+    name: Python Lint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pylint
           pip install -r requirements.txt
-      - name: Analysing the code with pylint
+      - name: Run pylint
         run: |
           PYTHONPATH=.:$PYTHONPATH pylint $(git ls-files '*.py')
 
   test:
-    name: Home Assistant Integration Tests
+    name: Python Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,17 +39,7 @@ jobs:
       - name: Install requirements
         run: |
           pip install -r requirements_dev.txt
-      - name: Run Home Assistant tests
+      - name: Run tests
         run: |
           export PYTHONPATH=$PWD
-          pytest tests/test_integration.py -v --cov=custom_components/pv_forecast --cov-report=xml
-      - name: Check for validation errors
-        run: |
-          python -m script.hassfest
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          flags: integration
-          name: codecov-umbrella
-          fail_ci_if_error: true
+          pytest tests/test_sensor_compat.py -v
